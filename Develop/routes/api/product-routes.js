@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
   // be sure to include its associated Category and Tag data
   try { 
     const productData = await Product.findAll({
-      include: [{model: Category}, { model: Tag}, { model: ProductTag}]
+      include: [{model: Category}, { model: Tag}]
     });
     res.status(200).json(productData);
   } catch (err) {
@@ -23,7 +23,7 @@ router.get('/:id', (req, res) => {
   // be sure to include its associated Category and Tag data
   try {
     const productData = await Product.findByPk(req.params.id, {
-      include: [{ model: Category }, { model: Tag },],
+      include: [{ model: Category }, { model: ProductTag },],
     });
 
     if (!productData) {
@@ -38,7 +38,7 @@ router.get('/:id', (req, res) => {
 });
 
 // create new product
-router.post('/', (req, res) => {
+router.post('/seed', (req, res) => {
   /* req.body should look like this...
     {
       product_name: "Basketball",
@@ -47,6 +47,19 @@ router.post('/', (req, res) => {
       tagIds: [1, 2, 3, 4]
     }
   */
+Product.create([
+{
+  productproduct_name: "Basketball",
+  price: 200.00,
+  stock: 3,
+  tagIds: [1, 2, 3, 4]
+},
+]).then(() => {
+  res.send('Seeding Success')
+});
+
+});
+
   Product.create(req.body)
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
@@ -67,7 +80,6 @@ router.post('/', (req, res) => {
       console.log(err);
       res.status(400).json(err);
     });
-});
 
 // update product
 router.put('/:id', (req, res) => {
@@ -113,6 +125,22 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete one product by its `id` value
+  try {
+    const ProductData = await Product.destroy({
+      where: {
+        id: req.params.id
+      }
+    });
+
+    if (!ProductData) {
+      res.status(404).json({ message: 'No Product found with this id!' });
+      return;
+    }
+
+    res.status(200).json(ProductData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = router;

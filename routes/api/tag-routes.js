@@ -6,7 +6,6 @@ const { Tag, Product, ProductTag } = require('../../models');
 router.get('/', (req, res) => {
   // find all categories
   // be sure to include its associated Products
-    // Get all books from the book table
     Tag.findAll({
       include: [{ model: Tag }, { model: Product }, { model: ProductTag }].then((TagData) => {
       
@@ -19,7 +18,7 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   // find one category by its `id` value
-  // be sure to include its associated Products
+  // be sure to include its associated tags
   Tag.findByPk({
     include: [{ model: Tag }, { model: Product }, { model: ProductTag },].then((TagData) => {
     res.json(TagData);

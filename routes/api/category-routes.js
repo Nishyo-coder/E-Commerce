@@ -14,31 +14,22 @@ const { Category, Product } = require('../../models');
 router.get('/', (req, res) => {
   // find all categories
   // be sure to include its associated Products
-  try {
-    const CategoryData = await Category.findAll();
-    res.status(200).json(CategoryData);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
+    // Get all books from the book table
+    Category.findAll({
+      include: [{ model: Category }, { model: Product }].then((CategoryData) => {
+      
+        res.json(CategoryData);
+    })
+  });
+}
+);
 
 router.get('/:id', (req, res) => {
   // find one category by its `id` value
   // be sure to include its associated Products
-  try {
-    const CategoryData = await Category.findByPk(req.params.id, {
-      include: [{ model: Category, through: Product, as: 'category_id' }]
-    });
-
-    if (!CategoryData) {
-      res.status(404).json({ message: 'No Category found with this id!' });
-      return;
-    }
-
-    res.status(200).json(CategoryData);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+  Category.findByPk(req.params.id).then((CategoryData) => {
+    res.json(CategoryData);
+  });
 });
 
 router.post('/', (req, res) => {
@@ -78,23 +69,16 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete a category by its `id` value
-    try {
-      const CategoryData = await Category.destroy({
+    Category.destroy({
         where: {
           id: req.params.id
-        }
-      });
-  
-      if (!CategoryData) {
-        res.status(404).json({ message: 'No Category found with this id!' });
-        return;
-      }
-  
-      res.status(200).json(CategoryData);
-    } catch (err) {
-      res.status(500).json(err);
-    }
-});
+        },
+      })
+        .then((deletedCategory) => {
+          res.json(deletedCategory);
+        })
+        .catch((err) => res.json(err));
+    });
 })
 
 module.exports = router;

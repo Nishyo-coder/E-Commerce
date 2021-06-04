@@ -5,49 +5,41 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 
 // get all products
 router.get('/', (req, res) => {
-  // find all products
-  // be sure to include its associated Category and Tag data
-  try { 
-    const productData = await Product.findAll({
-      include: [{model: Category}, { model: Tag}]
-    });
-    res.status(200).json(productData);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
+  // find all categories
+  // be sure to include its associated Products
+    // Get all books from the book table
+    Product.findAll({
+      include: [{ model: Category }, { model: Product }, { model: ProductTag },].then((ProductData) => {
+      
+        res.json(ProductData);
+    })
+  });
+}
+);
 
-// get one product
 router.get('/:id', (req, res) => {
-  // find a single product by its `id`
-  // be sure to include its associated Category and Tag data
-  try {
-    const productData = await Product.findByPk(req.params.id, {
-      include: [{ model: Category }, { model: ProductTag },],
-    });
-
-    if (!productData) {
-      res.status(404).json({ message: 'No item found with that id!' });
-      return;
-    }
-
-    res.status(200).json(productData);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+  // find one category by its `id` value
+  // be sure to include its associated Products
+  Product.findByPk({
+    include: [{ model: Category }, { model: Tag }, { model: ProductTag },].then((ProductData) => {
+    res.json(ProductData);
+  })
 });
+}
+);
 
-// create new product
+// create new product: /* req.body should look like this...
+  //   {
+  //     product_name: "Basketball",
+  //     price: 200.00,
+  //     stock: 3,
+  //     tagIds: [1, 2, 3, 4]
+  //   }
+  // */
+
+  
 router.post('/seed', (req, res) => {
-  /* req.body should look like this...
-    {
-      product_name: "Basketball",
-      price: 200.00,
-      stock: 3,
-      tagIds: [1, 2, 3, 4]
-    }
-  */
-Product.create([
+  Product.create([
 {
   productproduct_name: "Basketball",
   price: 200.00,
@@ -60,6 +52,7 @@ Product.create([
 
 });
 
+router.post('/', (req, res) => {
   Product.create(req.body)
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
@@ -80,6 +73,7 @@ Product.create([
       console.log(err);
       res.status(400).json(err);
     });
+  })
 
 // update product
 router.put('/:id', (req, res) => {
@@ -125,22 +119,16 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete one product by its `id` value
-  try {
-    const ProductData = await Product.destroy({
-      where: {
-        id: req.params.id
-      }
-    });
+  Product.destroy({
+    where: {
+      id: req.params.id
+    },
+  })
+    .then((deletedProduct) => {
+      res.json(deletedProduct);
+    })
+    .catch((err) => res.json(err));
 
-    if (!ProductData) {
-      res.status(404).json({ message: 'No Product found with this id!' });
-      return;
-    }
-
-    res.status(200).json(ProductData);
-  } catch (err) {
-    res.status(500).json(err);
-  }
 });
 
 module.exports = router;

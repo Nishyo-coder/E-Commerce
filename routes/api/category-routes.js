@@ -11,74 +11,74 @@ const { Category, Product } = require('../../models');
 
 // The `/api/categories` endpoint
 
-router.get('/', (req, res) => {
-  // find all categories
-  // be sure to include its associated Products
-    // Get all books from the book table
-    Category.findAll({
-      include: [{ model: Category }, { model: Product }].then((CategoryData) => {
-      
-        res.json(CategoryData);
-    })
+//   // find all categories
+//   // be sure to include its associated Products
+router.get('/', async (req, res) => {
+  // Store the categoryData in a variable once the promise is resolved.
+  const CategoryData = await Category.findAll({
+    include: [ { model: Product}],
   });
-}
-);
 
-router.get('/:id', (req, res) => {
-  // find one category by its `id` value
-  // be sure to include its associated Products
-  Category.findByPk(req.params.id).then((CategoryData) => {
-    res.json(CategoryData);
-  });
+  // Return the CategoryData promise inside of the JSON response
+  return res.json(CategoryData);
 });
 
-router.post('/', (req, res) => {
-  // create a new category
-  router.post('/', (req, res) => {
-    Category.create(req.body)
-      .then((newCategory) => {
-        res.json(newCategory);
-      })
-      .catch((err) => {
-        res.json(err);
-      });
 
-router.put('/:id', (req, res) => {
-  // update a category by its `id` value
-    Category.update(
-      {
-        // All the fields you can update and the data attached to the request body.
-        category_name: req.body.category_name,
-        id: req.body.id,
-      },
+// router.get('/:id', (req, res) => {
+//   // find one category by its `id` value
+//   // be sure to include its associated Products
+//   Category.findByPk(req.params.id).then((CategoryData) => {
+//     res.json(CategoryData);
+//   });
+// });
 
-      {
-        // Gets the category based on the id given in the request parameters
-        where: {
-          id: req.params.id,
-        },
-      }
-    )
-      .then((updatedCategory) => {
-        // Sends the updated category as a json response
-        res.json(updatedCategory);
-      })
-      .catch((err) => res.json(err));
-  });
-});
+// router.post('/', (req, res) => {
+//   // create a new category
+//   router.post('/', (req, res) => {
+//     Category.create(req.body)
+//       .then((newCategory) => {
+//         res.json(newCategory);
+//       })
+//       .catch((err) => {
+//         res.json(err);
+//       });
 
-router.delete('/:id', (req, res) => {
-  // delete a category by its `id` value
-    Category.destroy({
-        where: {
-          id: req.params.id
-        },
-      })
-        .then((deletedCategory) => {
-          res.json(deletedCategory);
-        })
-        .catch((err) => res.json(err));
-    });
-})
+// router.put('/:id', (req, res) => {
+//   // update a category by its `id` value
+//     Category.update(
+//       {
+//         // All the fields you can update and the data attached to the request body.
+//         category_name: req.body.category_name,
+//         id: req.body.id,
+//       },
+
+//       {
+//         // Gets the category based on the id given in the request parameters
+//         where: {
+//           id: req.params.id,
+//         },
+//       }
+//     )
+//       .then((updatedCategory) => {
+//         // Sends the updated category as a json response
+//         res.json(updatedCategory);
+//       })
+//       .catch((err) => res.json(err));
+//   });
+// });
+
+// router.delete('/:id', (req, res) => {
+//   // delete a category by its `id` value
+//     Category.destroy({
+//         where: {
+//           id: req.params.id
+//         },
+//       })
+//         .then((deletedCategory) => {
+//           res.json(deletedCategory);
+//         })
+//         .catch((err) => res.json(err));
+//     });
+// })
 
 module.exports = router;

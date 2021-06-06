@@ -120,8 +120,18 @@ Product.create({
 //     });
 // });
 
-// router.delete('/:id', (req, res) => {
-//   // delete one product by its `id` value
-// });
+router.delete('/:id', (req, res) => {
+  // delete a category by its `id` value
+    Product.destroy({
+        where: {
+          category_id: req.params.category_id,
+          product_id: req.params.product_id
+        },
+      })
+        .then((deletedCategory) => {
+          res.json(deletedCategory);
+        })
+        .catch((err) => res.json(err));
+    });
 
 module.exports = router;

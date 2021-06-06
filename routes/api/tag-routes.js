@@ -3,63 +3,64 @@ const { Tag, Product, ProductTag } = require('../../models');
 
 // The `/api/tags` endpoint
 
-// router.get('/', (req, res) => {
-//   // find all categories
-//   // be sure to include its associated Products
-//     Tag.findAll({
-//       include: [{ model: Tag }, { model: Product }, { model: ProductTag }].then((TagData) => {
-      
-//         res.json(TagData);
-//     })
-//   });
-// }
-// );
+router.get('/', async (req, res) => {
+  // Store the tag data in a variable once the promise is resolved.
+  const TagData = await Tag.findAll({
+    include: [ { model: Product},]
+  });
 
-
-router.get('/:id', (req, res) => {
-  // find one category by its `id` value
-  // be sure to include its associated tags
-  Tag.findByPk({
-    include: [{ model: Tag }, { model: Product }, { model: ProductTag },].then((TagData) => {
-    res.json(TagData);
-  })
+  // Return the Tag data promise inside of the JSON response
+  return res.json(TagData);
 });
-}
-);
+
+//get one tag
+router.get('/:id', async (req, res) => {
+  try {
+    const TagData = await Tag.findByPk(req.params.id, {
+      include: [ { model: Product},]
+    });
+   
+    if (!TagData) {
+      res.status(404).json({ message: 'No tag found with that id!' });
+      return;
+    }
+
+    res.status(200).json(TagData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 router.post('/', (req, res) => {
-  // create a new category
-  router.post('/', (req, res) => {
-    Tag.create(req.body)
-      .then((newTag) => {
-        res.json(newTag);
-      })
-      .catch((err) => {
-        res.json(err);
-      
-  });
+  // create a new tag
+    Tag.create({
+      tag_name: "Sporting Goods",
 })
-  
+    .then((newTag) => {
+      res.json(newTag)
+    })
+    .catch((err) => {
+      res.json(err);
+    });
 
-router.put('/:id', (req, res) => {
-  // update a tag's name by its `id` value
-  Tag.update(
+router.put('/:id', async (req, res) => {
+  //Calls the update method on the Book model
+  const updatedTag = await Tag.update(
     {
-      id:req.body.id,
-      product_id: req.body.product_id,
-
+      // All the fields you can update and the data attached to the request body.
+      tag_name: req.body.tag_name,
+      
     },
     {
+      // Gets a tag based on the id given in the request parameters
       where: {
-        product_id: req.params.product_id,
+        id: req.params.id,
+
       },
     }
-  )
-    .then((updatedTag) => {
-      // Sends the updated tag as a json response
-      res.json(updatedTag);
-    })
-    .catch((err) => res.json(err));
+  );
+  
+  res.json(updatedTag);
 });
 
 router.delete('/:id', (req, res) => {
